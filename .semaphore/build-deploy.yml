@@ -1,0 +1,63 @@
+version: v1.0
+
+name: Build and deploy
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+execution_time_limit:
+  hours: 23
+
+global_job_config:
+
+  secrets:
+    - name: ACCESS_TOKENS
+
+  prologue:
+    commands:
+      - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
+
+  env_vars:
+    - name: DOCKER_USERNAME
+      value: sineverba
+    - name: DOCKER_IMAGE
+      value: netlify-cli
+    - name: NODE_VERSION
+      value: 20.12.0
+    - name: NPM_VERSION
+      value: 10.5.0
+    - name: NETLIFY_CLI_VERSION
+      value: 17.21.1
+    - name: BUILDX_VERSION
+      value: 0.13.1
+
+blocks:
+  - name: 'Build and deploy'
+    task:
+      jobs:
+        - name: 'Build and deploy'
+          commands:
+            - checkout
+            - mkdir -vp ~/.docker/cli-plugins/
+            - >-
+              curl 
+              --silent 
+              -L 
+              "https://github.com/docker/buildx/releases/download/v$BUILDX_VERSION/buildx-v$BUILDX_VERSION.linux-amd64" 
+              > 
+              ~/.docker/cli-plugins/docker-buildx
+            - chmod a+x ~/.docker/cli-plugins/docker-buildx
+            - docker buildx version
+            - docker buildx ls
+            - docker buildx create --name multiarch --use
+            - docker buildx inspect --bootstrap --builder multiarch
+            - >-
+              docker buildx build 
+              --platform linux/arm64/v8,linux/amd64,linux/arm/v6,linux/arm/v7 
+              --build-arg NODE_VERSION=$NODE_VERSION 
+              --build-arg NPM_VERSION=$NPM_VERSION 
+              --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
+              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:$SEMAPHORE_GIT_TAG_NAME 
+              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:latest
+              --push 
+              "."

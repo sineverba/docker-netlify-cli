@@ -1,0 +1,56 @@
+version: v1.0
+
+name: Test
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+
+global_job_config:
+
+  secrets:
+    - name: ACCESS_TOKENS
+
+  prologue:
+    commands:
+      - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
+
+  env_vars:
+    - name: DOCKER_USERNAME
+      value: sineverba
+    - name: DOCKER_IMAGE
+      value: netlify-cli
+    - name: NODE_VERSION
+      value: 20.12.0
+    - name: NPM_VERSION
+      value: 10.5.0
+    - name: NETLIFY_CLI_VERSION
+      value: 17.21.1
+
+blocks:
+  - name: 'Build and test'
+    skip:
+      when: "tag =~ '.*'"
+    task:
+      jobs:
+        - name: 'Build and test'
+          commands:
+            - checkout
+            - >-
+              docker build 
+              --build-arg NODE_VERSION=$NODE_VERSION 
+              --build-arg NPM_VERSION=$NPM_VERSION 
+              --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
+              --tag $DOCKER_USERNAME/$DOCKER_IMAGE 
+              "."
+            - docker run --rm $DOCKER_USERNAME/$DOCKER_IMAGE cat /etc/os-release | grep "Alpine Linux v3.19"
+            - docker run --rm $DOCKER_USERNAME/$DOCKER_IMAGE cat /etc/os-release | grep "VERSION_ID=3.19.1"
+            - docker run --rm $DOCKER_USERNAME/$DOCKER_IMAGE node -v | grep $NODE_VERSION
+            - docker run --rm $DOCKER_USERNAME/$DOCKER_IMAGE npm -v | grep $NPM_VERSION
+            - docker run --rm $DOCKER_USERNAME/$DOCKER_IMAGE netlify -v | grep $NETLIFY_CLI_VERSION
+
+promotions:
+  - name: Deploy
+    pipeline_file: build-deploy.yml
+    auto_promote:
+      when: "result = 'passed' and tag =~ '.*'"
