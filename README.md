@@ -5,7 +5,7 @@ Docker Netlify CLI
 
 | CD / CI   | Status |
 | --------- | ------ |
-| Semaphore CI | [![Build Status](https://sineverba.semaphoreci.com/badges/docker-netlify-cli/branches/master.svg?style=shields&key=bd338b60-d353-4360-9911-4b81d6574423)](https://sineverba.semaphoreci.com/projects/docker-netlify-cli) |
+| Semaphore CI | [![Build Status](https://sineverba.semaphoreci.com/badges/docker-netlify-cli/branches/master.svg?style=shields)](https://sineverba.semaphoreci.com/projects/docker-netlify-cli) |
 
 
 ## Usage
