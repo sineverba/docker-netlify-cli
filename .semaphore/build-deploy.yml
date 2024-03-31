@@ -31,6 +31,9 @@ global_job_config:
       value: 17.21.1
     - name: BUILDX_VERSION
       value: 0.13.1
+    - name: DOCKER_HUB_TOOL
+      value: 0.4.6
+
 
 blocks:
   #- name: 'Build and deploy on AMD64 and ARM64'
@@ -89,4 +92,13 @@ blocks:
       jobs:
         - name: 'Delete ARM cache image'
           commands:
-            - curl -u $DOCKER_USERNAME:$DOCKER_TOKEN -X "DELETE" https://cloud.docker.com/v2/repositories/$DOCKER_USERNAME/$DOCKER_IMAGE/tags/cache-arm/
+            - >-
+              curl 
+              --silent 
+              -L 
+              "https://github.com/docker/hub-tool/releases/download/v$DOCKER_HUB_TOOL/hub-tool-linux-amd64.tar.gz"
+              -o hub-tool-linux.tar.gz
+            - tar --strip-components=1 -xzf ./hub-tool-linux.tar.gz
+            - ./hub-tool --version
+            - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
+            - ./hub-tool tag rm --verbose --force docker.io/$DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm || true
