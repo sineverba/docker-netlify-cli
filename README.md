@@ -21,4 +21,4 @@ Docker Netlify CLI
 
 | Github / Docker Image tag | Node Version | NPM Version | Netlify version | Architecture |
 | ------------------------- | ------------ | ----------- | --------------- | ------------ |
-| 1.0.0 | 20.12.0 | 10.5.0 | 17.15.1 | linux/arm64/v8,linux/amd64,linux/arm/v6,linux/arm/v7 |
+| 1.0.0 | 20.12.0 | 10.5.0 | 17.15.1 | linux/amd64, linux/arm64/v8 |
