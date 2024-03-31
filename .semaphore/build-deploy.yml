@@ -16,7 +16,7 @@ global_job_config:
   prologue:
     commands:
       - brew install colima docker
-      - colima start
+      - colima start --runtime docker
       - export DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock
       - docker --version
       - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
