@@ -12,13 +12,10 @@ global_job_config:
 
   secrets:
     - name: ACCESS_TOKENS
+    - name: VPS
 
   prologue:
     commands:
-      - brew install colima docker
-      - colima start --runtime docker
-      - export DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock
-      - docker --version
       - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
 
   env_vars:
@@ -46,14 +43,14 @@ blocks:
         - name: 'Build and deploy on ARM64'
           commands:
             - checkout
+            - ssh-keyscan -p $VPS01_OCI_PORT -H $VPS01_OCI_URL >> ~/.ssh/known_hosts
+            - chmod 0600 ~/.ssh/id_semaphore
+            - ssh-add ~/.ssh/id_semaphore
             - >-
-              docker build 
-              --build-arg NODE_VERSION=$NODE_VERSION 
-              --build-arg NPM_VERSION=$NPM_VERSION 
-              --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
-              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-$SEMAPHORE_GIT_TAG_NAME 
-              --push 
-              "."
+              ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
+              "echo $DOCKER_TOKEN | docker login --username $DOCKER_USERNAME --password-stdin && \
+              mkdir -p ~/cicd"
+
   - name: 'Build and deploy on AMD64'
     task:
       jobs:
