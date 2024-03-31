@@ -15,7 +15,7 @@ global_job_config:
 
   prologue:
     commands:
-      - brew install colima
+      - brew install colima docker
       - colima start
       - export DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock
       - docker --version
