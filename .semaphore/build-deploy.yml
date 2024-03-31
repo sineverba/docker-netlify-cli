@@ -32,7 +32,7 @@ global_job_config:
     - name: BUILDX_VERSION
       value: 0.13.1
 
-bl#ocks:
+blocks:
   #- name: 'Build and deploy on AMD64 and ARM64'
   #  task:
   #    jobs:
