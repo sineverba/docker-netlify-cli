@@ -15,8 +15,10 @@ global_job_config:
 
   prologue:
     commands:
-      - brew install docker docker-compose
+      - brew install docker docker-compose docker-buildx
       - docker --version
+      - docker buildx version
+      - docker buildx ls
       - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
 
   env_vars:
@@ -44,15 +46,6 @@ blocks:
         - name: 'Build and deploy on ARM64'
           commands:
             - checkout
-            - mkdir -vp ~/.docker/cli-plugins/
-            - >-
-              curl 
-              --silent 
-              -L 
-              "https://github.com/docker/buildx/releases/download/v$BUILDX_VERSION/buildx-v$BUILDX_VERSION.darwin-arm64" 
-              > 
-              ~/.docker/cli-plugins/docker-buildx
-            - chmod a+x ~/.docker/cli-plugins/docker-buildx
             - docker buildx version
             - docker buildx ls
             - docker buildx create --name multiarch --use
