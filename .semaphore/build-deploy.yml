@@ -15,7 +15,8 @@ global_job_config:
 
   prologue:
     commands:
-      - brew install --cask docker
+      - brew install hyperkit minikube docker docker-compose
+      - docker --version
       - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
 
   env_vars:
