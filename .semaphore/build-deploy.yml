@@ -92,6 +92,7 @@ blocks:
       jobs:
         - name: 'Delete ARM cache image'
           commands:
+            - sudo apt-get install -y jo moreutils
             - >-
               curl 
               --silent 
