@@ -46,10 +46,15 @@ blocks:
               ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
               "echo $DOCKER_TOKEN | docker login --username $DOCKER_USERNAME --password-stdin && mkdir -p ~/cicd && exit"
             - scp -P $VPS01_OCI_PORT Dockerfile $VPS01_OCI_USERNAME@$VPS01_OCI_URL:cicd
-            - echo docker buildx build --platform linux/arm64,linux/arm/v7,linux/arm/v6 --build-arg NODE_VERSION=$NODE_VERSION --build-arg NPM_VERSION=$NPM_VERSION --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm --push '.'
             - >-
               ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
-              "cd cicd && docker buildx create --name multiarch --use && docker buildx inspect --bootstrap --builder multiarch && docker buildx build --platform linux/arm64,linux/arm/v7,linux/arm/v6 --build-arg NODE_VERSION=$NODE_VERSION --build-arg NPM_VERSION=$NPM_VERSION --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm --push '.'"
+              "docker buildx create --name multiarch --use && docker buildx inspect --bootstrap --builder multiarch"
+            - >-
+              ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
+              "cd cicd && docker buildx build --platform linux/arm64,linux/arm/v6 --build-arg NODE_VERSION=$NODE_VERSION --build-arg NPM_VERSION=$NPM_VERSION --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm --push '.'"
+            - >-
+              ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
+              "docker buildx rm multiarch && docker image rm node:$NODE_VERSION-alpine3.19"
         - name: 'Build and deploy on AMD64'
           commands:
             - checkout
