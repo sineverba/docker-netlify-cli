@@ -15,7 +15,7 @@ global_job_config:
 
   prologue:
     commands:
-      - cat /proc/cpuinfo
+      - sysctl -n machdep.cpu.brand_string
       - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
 
   env_vars:
