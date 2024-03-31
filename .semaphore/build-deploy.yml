@@ -44,7 +44,10 @@ blocks:
             - ssh-add ~/.ssh/id_semaphore
             - >-
               ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
-              "echo $DOCKER_TOKEN | docker login --username $DOCKER_USERNAME --password-stdin && mkdir -p ~/cicd"
+              "echo $DOCKER_TOKEN | docker login --username $DOCKER_USERNAME --password-stdin && mkdir -p ~/cicd && exit"
+            - >-
+              scp Dockerfile Makefile -p $VPS01_OCI_PORT $VPS01_OCI_USERNAME@$VPS01_OCI_URL:~/cicd/
+              "make build"
 
   - name: 'Build and deploy on AMD64'
     task:
