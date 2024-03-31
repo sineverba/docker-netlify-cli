@@ -15,7 +15,7 @@ global_job_config:
 
   prologue:
     commands:
-      - sysctl -n machdep.cpu.brand_string
+      - brew install --cask docker
       - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
 
   env_vars:
