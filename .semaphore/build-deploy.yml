@@ -35,7 +35,7 @@ blocks:
   - name: 'Build and deploy on AMD64'
     task:
       jobs:
-        - name: 'Build and deploy'
+        - name: 'Build and deploy on AMD64'
           commands:
             - checkout
             - mkdir -vp ~/.docker/cli-plugins/

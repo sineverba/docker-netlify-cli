@@ -30,7 +30,8 @@ global_job_config:
 blocks:
   - name: 'Build and test'
     skip:
-      when: "tag =~ '.*'"
+      #when: "tag =~ '.*'"
+      when: true
     task:
       jobs:
         - name: 'Build and test'
