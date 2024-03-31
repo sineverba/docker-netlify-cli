@@ -92,7 +92,6 @@ blocks:
       jobs:
         - name: 'Delete ARM cache image'
           commands:
-            - sudo apt-get install -y moreutils jo
             - >-
               curl 
               --silent 
@@ -101,5 +100,8 @@ blocks:
               -o hub-tool-linux.tar.gz
             - tar --strip-components=1 -xzf ./hub-tool-linux.tar.gz
             - ./hub-tool --version
-            - echo -n $DOCKER_USERNAME:$DOCKER_TOKEN | base64 | jo -d. auths.hub-tool.auth=@- | jq -s '.[1] * .[0]' - ~/.docker/config.json | sponge ~/.docker/config.json
+            - export HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"$DOCKER_USERNAME\", \"password\": \"$DOCKER_TOKEN\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
+            - export USERNAME="$(printf '%s:' "$DOCKER_USERNAME" | base64 -w0)"
+            - export USER_PASS="$(printf '%s:%s' "$DOCKER_USERNAME" "$DOCKER_TOKEN" | base64 -w0)"
+            - printf '{"auths": {"hub-tool": {"auth": "%s"}, "hub-tool-refresh-token": {"auth": "%s"}, "hub-tool-token": { "auth": "%s", "identitytoken": "%s"}}}' "$USER_PASS" "$USERNAME" "$USERNAME" "$HUB_TOKEN" > ~/.docker/config.json
             - ./hub-tool tag rm --verbose --force docker.io/$DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm || true
