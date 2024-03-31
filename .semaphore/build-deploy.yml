@@ -36,7 +36,7 @@ blocks:
   - name: 'Build and deploy on AMD64 and ARM64'
     task:
       jobs:
-        - name: 'Build and deploy on ARM64'
+        - name: 'Build image for ARM64 and push for caching'
           commands:
             - checkout
             - ssh-keyscan -p $VPS01_OCI_PORT -H $VPS01_OCI_URL >> ~/.ssh/known_hosts
@@ -55,35 +55,10 @@ blocks:
             - >-
               ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
               "docker buildx rm multiarch && rm -r ~/cicd"
-        #- name: 'Build and deploy on AMD64'
-        #  commands:
-        #    - checkout
-        #    - mkdir -vp ~/.docker/cli-plugins/
-        #    - >-
-        #      curl 
-        #      --silent 
-        #      -L 
-        #      "https://github.com/docker/buildx/releases/download/v$BUILDX_VERSION/buildx-v$BUILDX_VERSION.linux-amd64" 
-        #      > 
-        #      ~/.docker/cli-plugins/docker-buildx
-        #    - chmod a+x ~/.docker/cli-plugins/docker-buildx
-        #    - docker buildx version
-        #    - docker buildx ls
-        #    - docker buildx create --name multiarch --use
-        #    - docker buildx inspect --bootstrap --builder multiarch
-        #    - >-
-        #      docker buildx build 
-        #      --platform linux/amd64 
-        #      --build-arg NODE_VERSION=$NODE_VERSION 
-        #      --build-arg NPM_VERSION=$NPM_VERSION 
-        #      --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
-        #      --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-amd 
-        #      --push 
-        #      "."
-  - name: 'Merge images'
+  - name: 'Build image for AMD64'
     task:
       jobs:
-        - name: 'Merge multiple images'
+        - name: 'Build image for AMD64'
           commands:
             - checkout
             - mkdir -vp ~/.docker/cli-plugins/
@@ -106,6 +81,7 @@ blocks:
               --build-arg NODE_VERSION=$NODE_VERSION 
               --build-arg NPM_VERSION=$NPM_VERSION 
               --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
-              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:merged 
+              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:$SEMAPHORE_GIT_TAG_NAME 
+              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:latest
               --push 
               "."
