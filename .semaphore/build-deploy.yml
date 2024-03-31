@@ -32,34 +32,6 @@ global_job_config:
       value: 0.13.1
 
 blocks:
-  - name: 'Build and deploy on AMD64'
-    task:
-      jobs:
-        - name: 'Build and deploy on AMD64'
-          commands:
-            - checkout
-            - mkdir -vp ~/.docker/cli-plugins/
-            - >-
-              curl 
-              --silent 
-              -L 
-              "https://github.com/docker/buildx/releases/download/v$BUILDX_VERSION/buildx-v$BUILDX_VERSION.linux-amd64" 
-              > 
-              ~/.docker/cli-plugins/docker-buildx
-            - chmod a+x ~/.docker/cli-plugins/docker-buildx
-            - docker buildx version
-            - docker buildx ls
-            - docker buildx create --name multiarch --use
-            - docker buildx inspect --bootstrap --builder multiarch
-            - >-
-              docker buildx build 
-              --platform linux/amd64 
-              --build-arg NODE_VERSION=$NODE_VERSION 
-              --build-arg NPM_VERSION=$NPM_VERSION 
-              --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
-              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-$SEMAPHORE_GIT_TAG_NAME 
-              --push 
-              "."
   - name: 'Build and deploy on ARM64'
     task:
       agent:
@@ -86,6 +58,34 @@ blocks:
             - >-
               docker buildx build 
               --platform linux/arm64/v8
+              --build-arg NODE_VERSION=$NODE_VERSION 
+              --build-arg NPM_VERSION=$NPM_VERSION 
+              --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
+              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-$SEMAPHORE_GIT_TAG_NAME 
+              --push 
+              "."
+  - name: 'Build and deploy on AMD64'
+    task:
+      jobs:
+        - name: 'Build and deploy on AMD64'
+          commands:
+            - checkout
+            - mkdir -vp ~/.docker/cli-plugins/
+            - >-
+              curl 
+              --silent 
+              -L 
+              "https://github.com/docker/buildx/releases/download/v$BUILDX_VERSION/buildx-v$BUILDX_VERSION.linux-amd64" 
+              > 
+              ~/.docker/cli-plugins/docker-buildx
+            - chmod a+x ~/.docker/cli-plugins/docker-buildx
+            - docker buildx version
+            - docker buildx ls
+            - docker buildx create --name multiarch --use
+            - docker buildx inspect --bootstrap --builder multiarch
+            - >-
+              docker buildx build 
+              --platform linux/amd64 
               --build-arg NODE_VERSION=$NODE_VERSION 
               --build-arg NPM_VERSION=$NPM_VERSION 
               --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
