@@ -15,10 +15,11 @@ global_job_config:
 
   prologue:
     commands:
-      - brew install docker-credential-helper docker colima
-      - colima start
-      - export DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock
+      - brew install hyperkit minikube docker
+      - minikube start
+      - eval $(minikube docker-env)
       - docker --version
+      - docker run hello-world
       - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
 
   env_vars:
