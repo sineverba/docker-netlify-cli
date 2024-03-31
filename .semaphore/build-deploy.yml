@@ -15,14 +15,10 @@ global_job_config:
 
   prologue:
     commands:
-      - brew install docker-machine docker docker-compose docker-buildx
-      - brew services start docker-machine
-      - mkdir -p ~/.docker/cli-plugins
-      - ln -sfn /usr/local/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
-      - ln -sfn /usr/local/opt/docker-buildx/bin/docker-buildx ~/.docker/cli-plugins/docker-buildx
+      - brew install docker-credential-helper docker colima
+      - colima start
+      - export DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock
       - docker --version
-      - docker buildx version
-      - docker buildx ls
       - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
 
   env_vars:
@@ -50,13 +46,8 @@ blocks:
         - name: 'Build and deploy on ARM64'
           commands:
             - checkout
-            - docker buildx version
-            - docker buildx ls
-            - docker buildx create --name multiarch --use
-            - docker buildx inspect --bootstrap --builder multiarch
             - >-
-              docker buildx build 
-              --platform linux/arm64/v8
+              docker build 
               --build-arg NODE_VERSION=$NODE_VERSION 
               --build-arg NPM_VERSION=$NPM_VERSION 
               --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
