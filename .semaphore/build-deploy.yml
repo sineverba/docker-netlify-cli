@@ -89,4 +89,4 @@ blocks:
       jobs:
         - name: 'Delete ARM cache image'
           commands:
-            - curl -u $DOCKER_USERNAME:DOCKER_TOKEN -X "DELETE" https://cloud.docker.com/v2/repositories/$DOCKER_USERNAME/$DOCKER_IMAGE/tags/cache-arm/
+            - curl -u $DOCKER_USERNAME:$DOCKER_TOKEN -X "DELETE" https://cloud.docker.com/v2/repositories/$DOCKER_USERNAME/$DOCKER_IMAGE/tags/cache-arm/
