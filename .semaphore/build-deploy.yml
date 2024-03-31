@@ -49,7 +49,7 @@ blocks:
             - echo docker buildx build --platform linux/arm64,linux/arm/v7,linux/arm/v6 --build-arg NODE_VERSION=$NODE_VERSION --build-arg NPM_VERSION=$NPM_VERSION --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm --push '.'
             - >-
               ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
-              "cd cicd && docker buildx build --platform linux/arm64,linux/arm/v7,linux/arm/v6 --build-arg NODE_VERSION=$NODE_VERSION --build-arg NPM_VERSION=$NPM_VERSION --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm --push '.'"
+              "cd cicd && docker buildx create --name multiarch --use && docker buildx inspect --bootstrap --builder multiarch && docker buildx build --platform linux/arm64,linux/arm/v7,linux/arm/v6 --build-arg NODE_VERSION=$NODE_VERSION --build-arg NPM_VERSION=$NPM_VERSION --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm --push '.'"
         - name: 'Build and deploy on AMD64'
           commands:
             - checkout
