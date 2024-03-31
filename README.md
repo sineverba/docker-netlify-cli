@@ -10,15 +10,15 @@ Docker Netlify CLI
 
 ## Usage
 
-`$ docker run --rm -it sineverba/netlify-cli:1.0.0 -v [YOUR_VOLUME]:app/ netlify [COMMAND]`
+`$ docker run --rm -it sineverba/netlify-cli:1.0.1 -v [YOUR_VOLUME]:app/ netlify [COMMAND]`
 
 
 ## Usage in .bashrc
 
-`alias netlify='docker run -it -v ${PWD}:/app --entrypoint netlify --rm sineverba/netlify-cli:1.0.0'`
+`alias netlify='docker run -it -v ${PWD}:/app --entrypoint netlify --rm sineverba/netlify-cli:1.0.1'`
 
 ## Github / image tags and versions
 
 | Github / Docker Image tag | Node Version | NPM Version | Netlify version | Architecture |
 | ------------------------- | ------------ | ----------- | --------------- | ------------ |
-| 1.0.0 | 20.12.0 | 10.5.0 | 17.15.1 | linux/arm64/v8,linux/amd64,linux/arm/v6,linux/arm/v7 |
+| 1.0.1 | 20.12.0 | 10.5.0 | 17.15.1 | linux/amd64, linux/arm64/v8 |
