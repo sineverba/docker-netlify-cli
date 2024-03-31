@@ -101,7 +101,7 @@ blocks:
             - docker buildx inspect --bootstrap --builder multiarch
             - >-
               docker buildx build 
-              --cache-from $DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm 
+              --cache-from type=registry,ref=$DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm 
               --platform linux/amd64,linux/arm64 
               --build-arg NODE_VERSION=$NODE_VERSION 
               --build-arg NPM_VERSION=$NPM_VERSION 
