@@ -15,8 +15,7 @@ global_job_config:
 
   prologue:
     commands:
-      - sudo apt-get install -y util-linux
-      - lscpu
+      - cat /proc/cpuinfo
       - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
 
   env_vars:
