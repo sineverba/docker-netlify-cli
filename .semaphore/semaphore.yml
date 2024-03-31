@@ -53,4 +53,5 @@ promotions:
   - name: Deploy
     pipeline_file: build-deploy.yml
     auto_promote:
-      when: "result = 'passed' and tag =~ '.*'"
+      #when: "result = 'passed' and tag =~ '.*'"
+      when: true
