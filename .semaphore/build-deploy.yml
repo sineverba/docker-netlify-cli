@@ -32,30 +32,58 @@ global_job_config:
     - name: BUILDX_VERSION
       value: 0.13.1
 
-blocks:
-  - name: 'Build and deploy on AMD64 and ARM64'
+bl#ocks:
+  #- name: 'Build and deploy on AMD64 and ARM64'
+  #  task:
+  #    jobs:
+  #      - name: 'Build and deploy on ARM64'
+  #        commands:
+  #          - checkout
+  #          - ssh-keyscan -p $VPS01_OCI_PORT -H $VPS01_OCI_URL >> ~/.ssh/known_hosts
+  #          - chmod 0600 ~/.ssh/id_semaphore
+  #          - ssh-add ~/.ssh/id_semaphore
+  #          - >-
+  #            ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
+  #            "echo $DOCKER_TOKEN | docker login --username $DOCKER_USERNAME --password-stdin && mkdir -p ~/cicd && exit"
+  #          - scp -P $VPS01_OCI_PORT Dockerfile $VPS01_OCI_USERNAME@$VPS01_OCI_URL:cicd
+  #          - >-
+  #            ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
+  #            "docker buildx create --name multiarch --use && docker buildx inspect --bootstrap --builder multiarch"
+  #          - >-
+  #            ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
+  #            "cd cicd && docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$NODE_VERSION --build-arg NPM_VERSION=$NPM_VERSION --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm --push '.'"
+  #          - >-
+  #            ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
+  #            "docker buildx rm multiarch && rm -r ~/cicd"
+  #      #- name: 'Build and deploy on AMD64'
+        #  commands:
+        #    - checkout
+        #    - mkdir -vp ~/.docker/cli-plugins/
+        #    - >-
+        #      curl 
+        #      --silent 
+        #      -L 
+        #      "https://github.com/docker/buildx/releases/download/v$BUILDX_VERSION/buildx-v$BUILDX_VERSION.linux-amd64" 
+        #      > 
+        #      ~/.docker/cli-plugins/docker-buildx
+        #    - chmod a+x ~/.docker/cli-plugins/docker-buildx
+        #    - docker buildx version
+        #    - docker buildx ls
+        #    - docker buildx create --name multiarch --use
+        #    - docker buildx inspect --bootstrap --builder multiarch
+        #    - >-
+        #      docker buildx build 
+        #      --platform linux/amd64 
+        #      --build-arg NODE_VERSION=$NODE_VERSION 
+        #      --build-arg NPM_VERSION=$NPM_VERSION 
+        #      --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
+        #      --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-amd 
+        #      --push 
+        #      "."
+  - name: 'Merge images'
     task:
       jobs:
-        - name: 'Build and deploy on ARM64'
-          commands:
-            - checkout
-            - ssh-keyscan -p $VPS01_OCI_PORT -H $VPS01_OCI_URL >> ~/.ssh/known_hosts
-            - chmod 0600 ~/.ssh/id_semaphore
-            - ssh-add ~/.ssh/id_semaphore
-            - >-
-              ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
-              "echo $DOCKER_TOKEN | docker login --username $DOCKER_USERNAME --password-stdin && mkdir -p ~/cicd && exit"
-            - scp -P $VPS01_OCI_PORT Dockerfile $VPS01_OCI_USERNAME@$VPS01_OCI_URL:cicd
-            - >-
-              ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
-              "docker buildx create --name multiarch --use && docker buildx inspect --bootstrap --builder multiarch"
-            - >-
-              ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
-              "cd cicd && docker buildx build --platform linux/arm64 --build-arg NODE_VERSION=$NODE_VERSION --build-arg NPM_VERSION=$NPM_VERSION --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm --push '.'"
-            - >-
-              ssh -t $VPS01_OCI_USERNAME@$VPS01_OCI_URL -p $VPS01_OCI_PORT
-              "docker buildx rm multiarch && docker image rm node:$NODE_VERSION-alpine3.19 && rm -r ~/cicd"
-        - name: 'Build and deploy on AMD64'
+        - name: 'Merge multiple images'
           commands:
             - checkout
             - mkdir -vp ~/.docker/cli-plugins/
@@ -73,10 +101,11 @@ blocks:
             - docker buildx inspect --bootstrap --builder multiarch
             - >-
               docker buildx build 
-              --platform linux/amd64 
+              --cache-from $DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm 
+              --platform linux/amd64,linux/arm64 
               --build-arg NODE_VERSION=$NODE_VERSION 
               --build-arg NPM_VERSION=$NPM_VERSION 
               --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
-              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:cache-amd 
+              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:merged 
               --push 
               "."
