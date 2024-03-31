@@ -81,7 +81,6 @@ blocks:
               --build-arg NODE_VERSION=$NODE_VERSION 
               --build-arg NPM_VERSION=$NPM_VERSION 
               --build-arg NETLIFY_CLI_VERSION=$NETLIFY_CLI_VERSION 
-              --tag $DOCKER_USERNAME/$DOCKER_IMAGE:$SEMAPHORE_GIT_TAG_NAME 
               --tag $DOCKER_USERNAME/$DOCKER_IMAGE:latest
               --push 
               "."
