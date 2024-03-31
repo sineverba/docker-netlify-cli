@@ -100,11 +100,5 @@ blocks:
               -o hub-tool-linux.tar.gz
             - tar --strip-components=1 -xzf ./hub-tool-linux.tar.gz
             - ./hub-tool --version
-            - >-
-              HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"$DOCKER_USERNAME\", \"password\": \"$DOCKER_TOKEN\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
-              USERNAME="$(printf '%s:' "$DOCKER_USERNAME" | base64 -w0)"
-              USER_PASS="$(printf '%s:%s' "$DOCKER_USERNAME" "$DOCKER_TOKEN" | base64 -w0)"
-              mkdir -p ~/.docker/
-              printf '{"auths": {"hub-tool": {"auth": "%s"}, "hub-tool-refresh-token": {"auth": "%s"}, "hub-tool-token": { "auth": "%s", "identitytoken": "%s"}}}' $USER_PASS" "$USERNAME" "$USERNAME" "$HUB_TOKEN" > ~/.docker/config.json
-            - echo $DOCKER_TOKEN | docker login --username "$DOCKER_USERNAME" --password-stdin
+            - echo $DOCKER_TOKEN | ./hub-tool login --username "$DOCKER_USERNAME" --password-stdin
             - ./hub-tool tag rm --verbose --force docker.io/$DOCKER_USERNAME/$DOCKER_IMAGE:cache-arm || true
